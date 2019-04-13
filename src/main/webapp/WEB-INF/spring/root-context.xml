@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:tx="http://www.springframework.org/schema/tx"
+	xmlns:aop="http://www.springframework.org/schema/aop"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+		http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop-4.3.xsd
+		http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx-4.3.xsd">
+
+	<!-- Root Context: defines shared resources visible to all other web components -->
+	<!-- Data Source Bean (Oracle) -->
+	<bean id="dataSourceSpied" class="org.apache.commons.dbcp.BasicDataSource" destroy-method="close">
+		<property name="driverClassName" value="oracle.jdbc.driver.OracleDriver" />
+		<property name="url" value="jdbc:oracle:thin:@localhost:1521:xe" />
+		<property name="username" value="anhj" />
+		<property name="password" value="anhj" />
+		<property name="defaultAutoCommit" value="false"></property>
+	</bean>
+
+	<bean id="dataSource" class="net.sf.log4jdbc.Log4jdbcProxyDataSource">
+		<constructor-arg ref="dataSourceSpied" />
+		<property name="logFormatter">
+			<bean class="net.sf.log4jdbc.tools.Log4JdbcCustomFormatter">
+				<property name="loggingType" value="MULTI_LINE" />
+				<property name="sqlPrefix" value="SQL         :  " />
+			</bean>
+		</property>
+	</bean>
+
+	<!-- Mybatis 추가 (Mapper 경로는 수정해서 사용) -->
+	<bean id="sqlSession" class="org.mybatis.spring.SqlSessionFactoryBean">
+		<property name="dataSource" ref="dataSource"></property>
+		<property name="mapperLocations" value="classpath:/mapper/**/*.xml"></property>
+		<property name="configLocation" value="classpath:/mybatis-config.xml"></property>
+	</bean>
+
+	<bean id="sqlSessionTemplate" class="org.mybatis.spring.SqlSessionTemplate">
+		<constructor-arg index="0" ref="sqlSession"></constructor-arg>
+	</bean>
+
+	<!-- Transaction 설정 -->
+	<bean id="txManager" class="org.springframework.jdbc.datasource.DataSourceTransactionManager">
+		<property name="dataSource" ref="dataSource"></property>
+	</bean>
+
+	<tx:advice id="txAdvice" transaction-manager="txManager">
+		<tx:attributes>
+			<tx:method name="select" read-only="true" />
+			<tx:method name="*" />
+		</tx:attributes>
+	</tx:advice>
+
+	<!-- AOP 설정 경로 수정해서 사용 - ex). expression="execution(* org.kh.member.model.service.MemberServiceImpl.*(..))" /> ※ 앞에 최상위 패키지명 반드시 적어야 오류 안남!! <aop:pointcut id="tranPointcut" expression="execution(* spring.*.*.*.*.*.*(..))" 
+		<aop:config> <aop:pointcut id="tranPointcut" expression="execution(* *.*.*.*.*.*.*(..))" /> <aop:advisor advice-ref="txAdvice" pointcut-ref="tranPointcut" /> </aop:config> /> -->
+</beans>

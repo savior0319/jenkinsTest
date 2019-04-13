@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+
+<mapper namespace="usersql">
+
+	<insert id="insertUser" parameterType="uv">
+	   <![CDATA[
+		INSERT INTO TESTUSER
+		(USER_ID, PASSOWRD, USER_NAME, USER_AGE, USER_GENDER, INSERT_DATE)
+		VALUES
+		(#{userId}, #{userPassword}, #{userName}, #{userAge}, #{userGender}, SYSDATE)
+		]]>
+	</insert>
+
+</mapper>
