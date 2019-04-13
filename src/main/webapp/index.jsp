@@ -10,7 +10,8 @@
 
 <body>
 	<form action="/join.do" method="POST">
-		<h1>회원가입 - Jenkins 추가 테스트</h1>
+		<h1>회원가입 - Jenkins 추가 테스트1</h1>
+		<h1>회원가입 - Jenkins 추가 테스트2</h1>
 		<hr>
 		아이디
 		<input type="text" name="userId">
